@@ -10,7 +10,7 @@ type userInteractor struct {
 }
 
 type UserInteractor interface {
-	Get(u []*model.User) ([]*model.User, error)
+	GetAll() ([]*model.User, error)
 	GetByID(UID string) (*model.User, error)
 	Create(u *model.User) (*model.User, error)
 	Update(u *model.User) (*model.User, error)
@@ -21,7 +21,7 @@ func NewUserInteractor(r UserRepository, p UserPresenter) UserInteractor {
 	return &userInteractor{r, p}
 }
 
-func (us *userInteractor) Get(u []*model.User) ([]*model.User, error) {
+func (us *userInteractor) GetAll() ([]*model.User, error) {
 	userList, err := us.UserRepository.FindAll()
 	if err != nil {
 		return nil, err

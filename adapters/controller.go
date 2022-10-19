@@ -13,10 +13,6 @@ type AppController struct {
 	User interface{ UserController }
 }
 
-type Context interface {
-	JSON(code int, i interface{}) error
-}
-
 type userController struct {
 	userInteractor interactor.UserInteractor
 }
@@ -35,11 +31,10 @@ func NewUserController(us interactor.UserInteractor) UserController {
 
 // GetUser will return all users
 func (uc *userController) GetUsers(ctx *gin.Context) {
-	var u []*model.User
 
-	u, err := uc.userInteractor.Get(u)
+	u, err := uc.userInteractor.GetAll()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while listing user items"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": model.ErrListing})
 		return
 	}
 
@@ -51,7 +46,7 @@ func (uc *userController) GetUser(ctx *gin.Context) {
 	// get the userID from the ctx params, key is "id"
 	userID := ctx.Param("id")
 	if userID == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "no user ID was provided"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": model.ErrNoID})
 		return
 	}
 
@@ -61,7 +56,7 @@ func (uc *userController) GetUser(ctx *gin.Context) {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		} else {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while listing user items"})
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": model.ErrListing})
 		}
 		return
 	}
@@ -99,7 +94,7 @@ func (uc *userController) UpdateUser(ctx *gin.Context) {
 	// get the userID from the ctx params, key is "id"
 	user.Id = ctx.Param("id")
 	if user.Id == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "no user ID was provided"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": model.ErrNoID})
 		return
 	}
 
@@ -124,7 +119,7 @@ func (uc *userController) DeleteUser(ctx *gin.Context) {
 	// get the userID from the ctx params, key is "id"
 	userID := ctx.Param("id")
 	if userID == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "no user ID was provided"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": model.ErrNoID})
 		return
 	}
 

@@ -26,7 +26,7 @@ func (r *userRepository) FindAll() ([]*model.User, error) {
 	// execute the sql statement
 	rows, err := r.db.Query("select * from users")
 	if err != nil {
-		log.Println("Unable to execute the query: ", err.Error())
+		log.Println(model.ErrQuery, err.Error())
 	}
 	defer rows.Close()
 	// iterate over the rows
